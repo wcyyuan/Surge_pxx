@@ -1,4 +1,16 @@
-## Surge APP
+# 图示
+
+这个非常重要
+![Preview](./x/make.png)
+
+编译插件
+![Preview](./x/编译.png)
+
+打包插件 ——> 到项目根目录
+![Preview](./x/打包.png)
+
+
+## Surge APP 分析
 ```objc
 1. `Surge 验证和管理` 
 Surge 使用网络请求定期检查许可证的有效性（refresh 请求）
