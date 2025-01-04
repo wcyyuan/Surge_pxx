@@ -1,0 +1,10 @@
+Package: com.pxx917144686.surge
+Name: Surge_pxx
+Version: 0.1
+Architecture: iphoneos-arm
+Maintainer: Nets
+Author: pxx917144686
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 14.0)
+Description: Surge for ios 测试一下～ //@pxx 
+Icon: icon/icon.png
