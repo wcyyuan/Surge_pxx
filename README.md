@@ -9,20 +9,20 @@
 ![Preview](./x/打包.png)
 
 
-## Surge APP 分析
+## Surge APP 破解 与 总结
 ```objc
-1. `Surge 验证和管理` 
+一. `Surge 验证和管理` 
 Surge 使用网络请求定期检查许可证的有效性（refresh 请求）
 服务器返回的许可证数据是加密和签名的，需要进行验证。
 使用 AES-CBC 加密算法对许可证内容进行解密，密钥和 IV 都是基于设备 ID 的 SHA-256 哈希值。
 
-2. `Surge 定期检查和过期时间判断` 
+二. `Surge 定期检查和过期时间判断` 
 Surge 使用 fusDate 来判断订阅的过期时间，结合每个功能的 unlockTime 来判断是否解锁该功能。
 
-3. `Surge 解密过程`
+三. `Surge 析许可证数据`
 通过 AES-CBC 解密算法解析许可证数据，进而获取解锁信息。
 
-4. `Surge 验证`
+四. `Surge 验证`
 验证确保返回的数据未被篡改，通过内置证书进行校验。
 ```
 
@@ -31,7 +31,7 @@ Surge 使用 fusDate 来判断订阅的过期时间，结合每个功能的 unlo
 
 
 
-## 一. `Surge 订阅` 
+## 1.针对 ——> `Surge 验证和管理`
 Surge 在执行某些操作时需要验证许可证，特别是加载主界面的 Feature 列表、授权管理、开启 Tunnel 等 UI 操作，以及通过 Timer 定期调用 refresh 接口来检查许可证的有效性。
 ```objc
 1.1 callSurgeLicServer 函数：
@@ -102,14 +102,14 @@ fusDate 是订阅的过期时间
 
 
 
-## 二. `订阅过期时间 和 功能解锁：
+## 2.针对 ——> `Surge 定期检查和过期时间判断`
 Surge 通过 fusDate 来判断订阅是否过期` 
 每个功能（如 Surge 的某个功能模块或服务）都有一个 unlockTime（解锁时间），当 fusDate 超过这个时间时，功能会被锁定。
 
 fusDate 用于与每个功能模块（FeatureDefine）中的 unlockTime 进行比较。若 fusDate 超过了 unlockTime，则该功能被锁定。
 
 
-## 三. `解密` 
+## 3.针对 ——> `Surge 析许可证数据`
 使用 AES-CBC 解密 policy 中的数据。解密使用了以下的密钥和初始化向量（IV）：
 密钥：SHA256(deviceID)[0:32] ——> 即设备 ID 的 SHA-256 哈希的前 32 字节
 
@@ -131,7 +131,7 @@ IV：SHA256(deviceID)[16:32] ——> 即设备 ID 的 SHA-256 哈希的第 16 �
 
 
 
-## 四. `Surge破解 代码解释`虚拟license服务器
+## 4.针对 ——> `Surge 验证`
 
 ```objc
 Hook网络请求
@@ -178,19 +178,27 @@ EVP_DigestVerifyFinal正好具有极强的pattern可以直接由Lumina识别，�
 
 
 
+## 关于. `头文件 引入的库 与作用` 
+
+![Preview](./x/1.png)
+
+#import <CoreFoundation/CoreFoundation.h>   //Core Foundation 是一个为 Apple 提供的底层框架，包含了大量用于处理基础数据结构（如字符串、日期、集合、数组等）和服务（如内存管理、事件调度等）的 API。
+
+#import <Foundation/Foundation.h>  //Foundation 是 Apple 的另一个重要框架，它提供了很多常用的类和函数，包括字符串处理、集合、文件管理、网络等。
+
+#include <assert.h>  //assert.h 是 C 语言的标准库之一，用于在程序中插入断言。断言是在调试模式下检查条件是否为真，如果为假，程序会停止并报告错误。
+
+#import <CommonCrypto/CommonDigest.h>  //这个头文件引入了 CommonCrypto 库中的加密和哈希功能。CommonCrypto 是 Apple 提供的一个加密库，提供了如 SHA-1、SHA-256、MD5 等常见的哈希算法。
+
+#import <CommonCrypto/CommonCryptor.h>  //这个头文件引入了 CommonCrypto 库中的加密算法功能，提供了加密和解密的 API。
+
+#include <mach-o/dyld.h>  //dyld 是一个用于加载和链接动态库（shared libraries）的库。dyld.h 提供了与动态库加载有关的功能。
 
 
-#import <CoreFoundation/CoreFoundation.h>
 
-#import <Foundation/Foundation.h>
 
-#include <assert.h>
 
-#import <CommonCrypto/CommonDigest.h>  // 引入CommonCrypto库，提供加密功能
 
-#import <CommonCrypto/CommonCryptor.h>  // 引入CommonCrypto库，提供加密算法
-
-#include <mach-o/dyld.h>  // 引入dyld库，用于动态链接和加载
 
 ## 关于. `NSMutableURLRequest` 
 
