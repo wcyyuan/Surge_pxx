@@ -1,3 +1,4 @@
+<!-- 图片部分 -->
 <div style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap; width: 100%; overflow: auto; gap: 20px;">
     <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/01.png?raw=true" width="300" />
     <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/02.png?raw=true" width="300" />
@@ -7,12 +8,15 @@
     <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/06.png?raw=true" width="300" />
 </div>
 
-<table>
+<hr style="border: 1px solid #ccc; margin: 30px 0;">
+
+<!-- Theos 图片与命令部分 -->
+<table style="width: 100%;">
 <tr>
-<td style="padding-right: 20px;">
+<td style="padding-right: 20px; width: 50%;">
     <img src="./x/theos.png" width="400" height="180" />
 </td>
-<td>
+<td style="width: 50%; vertical-align: top;">
     <pre>
     终端执行 克隆 Theos 仓库
     git clone --recursive https://github.com/theos/theos.git
@@ -43,11 +47,14 @@
 </tr>
 </table>
 
-</details>
+<hr style="border: 1px solid #ccc; margin: 30px 0;">
 
-<!-- Theos 清理、编译、打包 -->
+<!-- Theos 编译预览图片 -->
 ![Preview](./x/编译.png)
 
+<hr style="border: 1px solid #ccc; margin: 30px 0;">
+
+<!-- Theos 报错说明部分 -->
 <details>
 <summary> 👉  如果 theos 报错 </summary>
 
@@ -60,6 +67,9 @@
 
 </details>
 
+<hr style="border: 1px solid #ccc; margin: 30px 0;">
+
+<!-- make 报错说明部分 -->
 <details>
 <summary> 👉  如果 make 报错 </summary>
 
@@ -78,6 +88,9 @@
 
 </details>
 
+<hr style="border: 1px solid #ccc; margin: 30px 0;">
+
+<!-- 关于核心代码部分 -->
 <h1 align="center">
   <br>
   关于. `（Tweak）核心代码 `
@@ -91,8 +104,8 @@ Objective-C 的运行时编程、动态 Hook（通过 Theos/Logos 语法）、�
 
 ---
 
-| **模块/方法**                                         | **解释**                                                                                              |
-|------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **方法**                                         | **解释**                                                                                              |
+|--------------------------------------------------|-------------------------------------------------------------------------------------------------------|
 | **`#import <CoreFoundation/CoreFoundation.h>`**      | 引入 CoreFoundation，提供底层数据结构和内存管理支持。                                                     |
 | **`#import <UIKit/UIKit.h>`**                         | 引入 UIKit，用于构建 UI、处理视图与用户交互。                                                             |
 | **`#import <objc/runtime.h>`**                        | 导入运行时库，支持动态方法交换、类检测和运行时 Hook 操作。                                                |
@@ -130,7 +143,7 @@ Objective-C 的运行时编程、动态 Hook（通过 Theos/Logos 语法）、�
 
 ---
 
-| **定义/函数**                                                      | **解释**                                                                                           |
+| **定义/方法**                                                      | **解释**                                                                                           |
 |---------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | **`#define FIXED_EXPIRATION_DATE 2524608000`**                       | 定义一个固定的过期时间，通常用于伪造 license 信息中的失效日期。                                      |
 | **`char LicEncContent[] = "\x03\x04\x02NSExtension";`**              | 定义静态许可加密内容的原始字节数据，用于后续生成 license 加密信息。                                   |
@@ -157,3 +170,164 @@ Objective-C 的运行时编程、动态 Hook（通过 Theos/Logos 语法）、�
 | **`- (void)showAlert`**                          | 构造并展示一个 UIAlertController 弹窗，提供“不同意”（退出应用）和“好的”两个选项。                    |
 | **`getActiveTopViewController()`**             | 辅助函数，获取当前处于前台的顶层视图控制器，确保弹窗显示在正确的 UI 层级上。                          |
 | **`%end`**                                     | 结束 UIViewController 的 Hook 代码块。                                                             |
+
+---
+
+## 关于反调试、反虚拟化与反静态分析
+
+通过系统调用和冗余代码，检测调试器、模拟器环境，并加入混淆代码，增加逆向破解的难度。
+
+---
+
+| **函数**                           | **解释**                                                                                         |
+|------------------------------------|--------------------------------------------------------------------------------------------------|
+| **`BOOL isDebuggerAttached()`**     | 利用 sysctl 获取进程状态，判断是否存在调试器附加。                                                 |
+| **`BOOL isRunningInSimulator()`**   | 通过 uname 获取系统信息，比对机器类型（如 x86_64、i386）判断是否运行在模拟器上。                      |
+| **`void confuseStaticAnalysis()`**  | 引入无实际功能的冗余运算及输出，混淆静态分析工具，增加逆向工程的难度。                              |
+
+---
+
+## 关于文件完整性校验与 SHA-256 计算
+
+提供数据摘要计算接口，用于校验文件完整性及生成加密时所需的摘要数据。
+
+---
+
+| **函数**                        | **解释**                                                                                         |
+|---------------------------------|--------------------------------------------------------------------------------------------------|
+| **`BOOL verifyIntegrity()`**     | 文件完整性校验函数，目前始终返回 YES，预留未来扩展。                                               |
+| **`NSString* sha256(NSData *data)`** | 利用 CommonCrypto 计算传入数据的 SHA256 摘要，并以十六进制字符串格式返回                         |
+
+---
+
+## 关于 NSData 与 NSString 的 SHA256 分类扩展
+
+为 NSData 与 NSString 分别扩展 SHA256 方法，方便直接调用进行数据摘要计算。
+
+---
+
+| **类别**                              | **解释**                                                                                         |
+|---------------------------------------|--------------------------------------------------------------------------------------------------|
+| **`@interface NSData (SHA256)`**       | 为 NSData 添加 `-SHA256` 方法，返回 NSData 格式的 SHA256 摘要。                                   |
+| **`@interface NSString (SHA256)`**     | 为 NSString 添加 `-SHA256` 方法，先将字符串转为 NSData 后计算 SHA256 摘要                       |
+
+---
+
+## 关于 NSMutableURLRequest 的扩展（Curl 命令打印）
+
+通过扩展 NSMutableURLRequest 的 description 方法，将请求转换为等效的 curl 命令，便于调试和复现网络请求。
+
+---
+
+| **方法**                                | **解释**                                                                                         |
+|-----------------------------------------|--------------------------------------------------------------------------------------------------|
+| **`- (NSString *)description`**          | 重写 description 方法，将 HTTP 方法、URL、Header 及 Body 转换为 curl 命令格式字符串               |
+
+---
+
+## 关于 NSURLSession 及 NSURLSessionDataTask 的 Hook
+
+拦截网络请求，检测返回状态并伪造响应，同时记录请求日志，确保网络请求符合预期。
+
+---
+
+| **模块/方法**                                         | **解释**                                                                                              |
+|------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **`%hook NSURLSession`**                              | Hook NSURLSession 的 `dataTaskWithRequest:completionHandler:` 方法，检测响应为 403 时伪造返回 200 状态 |
+| **`wrappedCompletion`**                              | 包装原始 completionHandler，判断 HTTP 状态码并构造伪造 JSON 数据返回                                 |
+| **`%hook NSURLSessionDataTask`**                     | Hook NSURLSessionDataTask 的 `resume` 方法，记录任务启动日志，便于调试网络请求                        |
+
+---
+
+## 关于 SGNSARequestHelper 与 SGAPIManager 的 Hook
+
+针对特定 API 请求，直接返回伪造数据以绕过服务器校验，实现模块激活及 license 验证的绕过。
+
+---
+
+| **模块/方法**                                           | **解释**                                                                                              |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **`%hook SGNSARequestHelper`**                          | Hook SGNSARequestHelper 的 `request:completeBlock:` 方法，拦截如 `/api/modules/v2`、`/api/license/verify` 等接口请求 |
+| **`wrapper`**                                          | 用于封装伪造响应数据的 block，将伪造 JSON 数据返回给上层调用者                                         |
+| **`%hook SGAPIManager`**                                | Hook SGAPIManager 的 `performRequest:completion:` 方法，针对 `/api/modules/v2` 请求返回伪造模块数据         |
+
+---
+
+## 关于 SGULicenseViewController 的 Hook
+
+修改 SGULicenseViewController 内部处理 license 数据的逻辑，伪造并修正 license 信息，确保应用认为已激活。
+
+---
+
+| **方法**                                 | **解释**                                                                                             |
+|------------------------------------------|------------------------------------------------------------------------------------------------------|
+| **`%hook SGULicenseViewController`**       | Hook 处理 license 响应的各个方法                                                                    |
+| **`- (void)reloadCells`**                  | 修改内部 `_response` 数据，伪造 license 相关字段（如 email、expirationDate、plan 等），并添加当前设备信息  |
+
+---
+
+## 关于 SGUProFeatureDefine 与 SGPolicyProxyWithTLS 的 Hook
+
+通过修改解锁时间和服务器证书校验逻辑，实现绕过专业功能限制及 TLS 安全校验。
+
+---
+
+| **模块/方法**                                         | **解释**                                                                                              |
+|------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **`%hook SGUProFeatureDefine`**                        | Hook `unlockTime` 方法，强制返回 0，使得所有专业功能均被解锁                                           |
+| **`%hook SGPolicyProxyWithTLS`**                       | 修改服务器证书指纹验证及 TLS 握手处理逻辑，返回伪造指纹或直接信任服务器证书，绕过安全校验              |
+
+---
+
+## 关于 SGNSARequestHelper 与 SGAPIManager 的 Hook
+
+针对特定 API 请求，直接返回伪造数据以绕过服务器校验，实现模块激活及 license 验证的绕过。
+
+---
+
+| **模块/方法**                                           | **解释**                                                                                              |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **`%hook SGNSARequestHelper`**                          | Hook SGNSARequestHelper 的 `request:completeBlock:` 方法，拦截如 `/api/modules/v2`、`/api/license/verify` 等接口请求 |
+| **`wrapper`**                                          | 用于封装伪造响应数据的 block，将伪造 JSON 数据返回给上层调用者                                         |
+| **`%hook SGAPIManager`**                                | Hook SGAPIManager 的 `performRequest:completion:` 方法，针对 `/api/modules/v2` 请求返回伪造模块数据         |
+
+---
+
+## 关于 SGULicenseViewController 的 Hook
+
+修改 SGULicenseViewController 内部处理 license 数据的逻辑，伪造并修正 license 信息，确保应用认为已激活。
+
+---
+
+| **方法**                                 | **解释**                                                                                             |
+|------------------------------------------|------------------------------------------------------------------------------------------------------|
+| **`%hook SGULicenseViewController`**       | Hook 处理 license 响应的各个方法                                                                    |
+| **`- (void)reloadCells`**                  | 修改内部 `_response` 数据，伪造 license 相关字段（如 email、expirationDate、plan 等），并添加当前设备信息  |
+
+---
+
+## 关于 SGUProFeatureDefine 与 SGPolicyProxyWithTLS 的 Hook
+
+通过修改解锁时间和服务器证书校验逻辑，实现绕过专业功能限制及 TLS 安全校验。
+
+---
+
+| **模块/方法**                                         | **解释**                                                                                              |
+|------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **`%hook SGUProFeatureDefine`**                        | Hook `unlockTime` 方法，强制返回 0，使得所有专业功能均被解锁                                           |
+| **`%hook SGPolicyProxyWithTLS`**                       | 修改服务器证书指纹验证及 TLS 握手处理逻辑，返回伪造指纹或直接信任服务器证书，绕过安全校验              |
+
+## 关于 绕过 OpenSSL 签名验证
+
+---
+
+利用 Hook 技术拦截 OpenSSL 签名验证函数 `EVP_DigestVerifyFinal`，强制返回验证成功，并在构造函数中动态解析该函数地址。
+
+---
+
+| **模块/方法**                                                | **解释**                                                                                              |
+|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| **`%hookf(uint64_t, pEVP_DigestVerifyFinal, ...)`**          | Hook OpenSSL 签名验证函数，强制返回 1 表示签名验证成功，从而绕过 license 签名校验。                     |
+| **`%ctor`**                                                 | 构造函数，在动态库加载时执行，通过内存扫描或符号查找动态获取 `EVP_DigestVerifyFinal` 的地址。              |
+
+---
