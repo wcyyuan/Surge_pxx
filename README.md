@@ -47,6 +47,27 @@ source ~/.zshrc
 ![Preview](./x/编译.png)
 </details> 
 
+| **theos报错** | **解释** |
+|----------|----------|
+| **报错** | ld: warning: -multiply_defined is obsolete |
+| **解释** | 为什么会出现这个问题？ |
+| **原因** | 新版本的 Apple 链接器 (ld64) 不再推荐使用 `-multiply_defined`；Theos 为了兼容旧版本 iOS，才默认加入该选项。 |
+| **解决** | 在文件 `theos/makefiles/targets/_common/darwin_tail.mk` 中找到并删除 `-multiply_defined`。 |
+
+| **make报错**                           | **解释**                                                                                                                                                                                                                                                                         |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **报错**                           | `warning: ignoring file '/usr/local/Cellar/openssl@3/3.4.0/lib/libcrypto.3.dylib': found architecture 'x86_64', required architecture 'arm64e'`                                                                                                                                |
+| **解释**                           | 不匹配架构的 OpenSSL 库。安装适用于 arm64 的 OpenSSL，可以解决此问题。                                                                                                                                                                                                             |
+| **检查**                           | Mac 架构检查：<br>- 在终端执行 `uname -m` <br>- 输出 `x86_64` 表示 Intel Mac<br>- 输出 `arm64` 表示 Apple Silicon Mac                                                                                                                     |
+| **解决（Intel x86_64 方法）**         | 避免耽误时间精力！网络指导可能产生误导，把 Intel (x86_64) 的方法误导为适用于 arm64 的方法。使用 Intel Mac 编译 iOS 插件时，目标架构应为 `arm64` 或 `arm64e`。                                                                                                    |
+| **步骤一：下载 OpenSSL 官方源代码** | - 在终端执行：`git clone https://github.com/openssl/openssl.git` <br>- 进入目录：`cd openssl`                                                                                                                                                                                   |
+| **步骤二：设置环境变量**             | - 执行：`export PLATFORM="iPhoneOS"` <br>- 执行：`export SDK=$(xcrun --sdk iphoneos --show-sdk-path)` <br>- 执行：`export CC="$(xcrun --sdk iphoneos -f clang)"`                                                                                                               |
+| **设置支持多个架构**                | - 执行：`export ARCHS="arm64 arm64e"` <br>- 执行：`export CFLAGS="-arch arm64 -arch arm64e -isysroot $SDK -miphoneos-version-min=14.0"` <br>- 执行：`export LDFLAGS="-arch arm64 -arch arm64e -isysroot $SDK"`                                                  |
+| **配置 OpenSSL 编译**              | 执行：`./Configure ios64-cross no-shared no-dso no-hw no-engine --prefix=$(PWD)/../openssl-ios`                                                                                                                                                                                  |
+| **步骤三：编译 OpenSSL**            | - 清理缓存：`make clean` <br>- 编译 OpenSSL：`make` <br>- 安装 OpenSSL 到指定目录：`make install`                                                                                                                                                                               |
+| **验证编译结果**                   | 在终端执行：<br>- `lipo -info ../openssl-ios/lib/libcrypto.a` <br>- `lipo -info ../openssl-ios/lib/libssl.a` <br>成功的输出应显示：`arm64 arm64e`                                                                                                                               |
+
+
 <h1 align="center">
   <br>
   关于. `（Tweak）核心代码 `
