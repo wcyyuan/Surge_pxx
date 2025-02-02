@@ -42,7 +42,7 @@
 
     终端执行 重新 加载配置：
     source ~/.zshrc
-    </pre>
+
 </td>
 </tr>
 </table>
@@ -89,6 +89,78 @@
 | **验证编译结果**                   | 在终端执行：<br>- `lipo -info ../openssl-ios/lib/libcrypto.a` <br>- `lipo -info ../openssl-ios/lib/libssl.a` <br>成功的输出应显示：`arm64 arm64e`                                                                                                                               |
 
 </details>
+
+
+
+# 关于 解决 Surge 5.9.0 及以上版本模块403 验证机制
+
+Surge 5.9.0 及以后版本使用 **License 校验** 来管理应用的授权。验证过程涉及与服务器的通信，检查设备信息、授权政策和签名校验。为确保授权有效性，Surge 会定期进行授权检查，包括 **refresh** 和 **verify** 请求。 
+
+| 请求 | 解释 |
+| :---: | --- |
+| **deviceID** | 设备唯一标识符 |
+| **systemVersion** | 设备的操作系统版本 |
+| **bundle** | 应用标识符 |
+
+服务器会返回一个 **policy** 对象，其中包括：
+
+| 关键字 | 解释 |
+| :---: | --- |
+| **expirationDate** | 授权到期时间 |
+| **fusDate** | 订阅有效期 |
+| **sign** | 用于校验数据完整性的加密签名 |
+
+在获取到授权数据后，Surge 会对返回的 **sign** 进行 OpenSSL 校验，确保数据未被篡改。如果 **expirationDate** 已过期或签名验证失败，Surge 会限制部分功能，通常表现为 **403 Forbidden** 错误。
+
+## 关键方法分析
+
+### SGNSARequestHelper
+负责处理与服务器通信的关键类，发起 **refresh** 和 **verify** 请求。通过该方法可以拦截并修改请求，返回伪造的 **policy** 数据。
+
+| 方法 | 解释 |
+| :---: | --- |
+| `- (id)request:(NSMutableURLRequest *)req completeBlock:(void (^)(NSData *, NSURLResponse *, NSError *))completeBlock` | 发送 License 校验请求，通过该方法可以拦截请求并修改返回的 **policy** 数据。|
+
+### NSURLSession
+使用 `NSURLSession` 处理与服务器的通信，负责发送请求并接收响应。可以通过 Hook 该方法，拦截 **403 Forbidden** 响应并返回伪造数据。
+
+| 方法 | 解释 |
+| :---: | --- |
+| `- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request completionHandler:(void (^)(NSData *, NSURLResponse *, NSError *))completionHandler` | 通过 HTTP 请求与服务器交互。可以拦截并修改服务器响应，绕过授权限制。|
+
+### SGULicenseViewController
+用于在 UI 层显示授权信息，包括授权状态和到期时间。可以 Hook 该类的方法，修改 **policy** 的解析逻辑，确保授权显示为有效。
+
+| 方法 | 解释 |
+| :---: | --- |
+| `- (void)reloadCells` | 更新 UI 层授权信息，可以修改 **policy** 的解析，使其始终显示授权有效。|
+
+### SGPolicyProxyWithTLS
+Surge 使用 **TLS** 来确保服务器通信的安全性，`SGPolicyProxyWithTLS` 负责处理服务器证书验证。可以通过 Hook 该方法绕过证书验证。
+
+| 方法 | 解释 |
+| :---: | --- |
+| `- (BOOL)serverCertificateFingerprintSHA256:(NSData *)serverCertFingerprint` | 校验服务器证书的指纹。可以返回固定的指纹值，绕过证书验证。|
+
+### pEVP_DigestVerifyFinal
+Surge 使用 **OpenSSL** 校验返回的授权数据签名。通过 Hook 该方法并返回固定值，可以绕过 **sign** 校验。
+
+| 方法 | 解释 |
+| :---: | --- |
+| `uint64_t pEVP_DigestVerifyFinal(void *ctx, uint64_t a2, uint64_t a3)` | 校验授权数据的签名。通过 Hook 该方法并返回 `1`，绕过签名验证。|
+
+## 授权校验与功能限制
+
+Surge 的授权校验流程的核心是 **expirationDate** 和 **sign** 校验。客户端会与服务器通信，根据返回的 **policy** 数据判断是否继续提供授权服务。如果校验失败或授权过期，Surge 会限制部分功能，表现为 **403 Forbidden** 错误。
+
+| 校验项 | 解释 |
+| :---: | --- |
+| **expirationDate** | 判断授权是否过期 |
+| **sign** | 校验数据签名是否有效 |
+
+绕过这些校验，可以确保授权始终有效，防止出现 **403 Forbidden** 错误。
+
+
 
 <hr style="border: 1px solid #ccc; margin: 30px 0;">
 
