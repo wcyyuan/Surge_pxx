@@ -14,7 +14,7 @@
 <table style="width: 100%;">
 <tr>
 <td style="padding-right: 20px; width: 50%;">
-    <img src="./x/theos.png" width="400" height="180" />
+    <img src="./x/theos.png" style="width: 100%; max-width: 400px; height: auto;" />
 </td>
 <td style="width: 50%; vertical-align: top;">
     <pre>
@@ -42,12 +42,14 @@
 
     终端执行 重新 加载配置：
     source ~/.zshrc
-
+    </pre>
 </td>
 </tr>
 </table>
 
 <hr style="border: 1px solid #ccc; margin: 30px 0;">
+
+
 
 <!-- Theos 编译预览图片 -->
 ![Preview](./x/编译.png)
@@ -56,7 +58,7 @@
 
 <!-- Theos 报错说明部分 -->
 <details>
-<summary> 👉  如果 theos 报错 </summary>
+<summary> 👉  如果 theos 报错:ld: warning: -multiply_defined is obsolete </summary>
 
 | **theos报错** | **解释** |
 |----------|----------|
@@ -71,7 +73,7 @@
 
 <!-- make 报错说明部分 -->
 <details>
-<summary> 👉  如果 make 报错 </summary>
+<summary> 👉  如果 make 报错:found architecture 'x86_64', required architecture </summary>
 
 | **make报错**                           | **解释**                                                                                                                                                                                                                                                                         |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -96,7 +98,32 @@
   关于. `（Tweak）核心代码 `
 </h1>
 
-![Preview](./x/Tweak.x.png)
+<div style="display: flex; justify-content: space-evenly; align-items: center; flex-wrap: wrap; width: 100%; overflow: auto; gap: 20px;">
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.x.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.1.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.2.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.3.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.4.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.5.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.6.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.7.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.8.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.9.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.10.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.11.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.12.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.13.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.14.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.15.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.16.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.17.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.18.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.19.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.20.png?raw=true" class="responsive-img" />
+    <img src="https://github.com/pxx917144686/Surge_pxx/blob/main/x/Tweak.21.png?raw=true" class="responsive-img" />
+</div>
+
+<hr style="border: 1px solid #ccc; margin: 30px 0;">
 
 ## 目录 - 简单的概括
 
