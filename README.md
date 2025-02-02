@@ -112,7 +112,7 @@ Surge 5.9.0 及以后版本使用 **License 校验** 来管理应用的授权。
 
 在获取到授权数据后，Surge 会对返回的 **sign** 进行 OpenSSL 校验，确保数据未被篡改。如果 **expirationDate** 已过期或签名验证失败，Surge 会限制部分功能，通常表现为 **403 Forbidden** 错误。
 
-## 关键方法分析
+## （Tweak）核心代码
 
 ### SGNSARequestHelper
 负责处理与服务器通信的关键类，发起 **refresh** 和 **verify** 请求。通过该方法可以拦截并修改请求，返回伪造的 **policy** 数据。
