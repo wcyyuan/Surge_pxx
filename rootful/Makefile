@@ -1,7 +1,7 @@
 # 插件：包信息
 PACKAGE_IDENTIFIER = com.pxx917144686.surge
 PACKAGE_NAME = Surge_pxx
-PACKAGE_VERSION = 0.3
+PACKAGE_VERSION = 0.4
 PACKAGE_ARCHITECTURE = arm64 arm64e
 PACKAGE_REVISION = 1540
 PACKAGE_SECTION = Tweaks
@@ -35,8 +35,6 @@ export THEOS_PACKAGE_DIR = $(CURDIR)
 # TARGET
 ARCHS = arm64 arm64e
 TARGET = iphone:clang:latest:14.5
-
-
 
 # 确保这些进程名称是正确的，如果进程名称不匹配，插件将无法注入到正确的应用中。
 INSTALL_TARGET_PROCESSES = Surge-iOS
