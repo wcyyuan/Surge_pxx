@@ -36,7 +36,10 @@ export THEOS_PACKAGE_DIR = $(CURDIR)
 ARCHS = arm64 arm64e
 TARGET = iphone:clang:latest:14.5
 
-
+# THEOS_PACKAGE_SCHEME = rootless 表示编译一个 Rootless 插件
+export THEOS_PACKAGE_SCHEME = rootless
+# 设置了安装路径为 /var/jb，这是 Rootless 环境下的默认路径。
+THEOS_PACKAGE_INSTALL_PREFIX = /var/jb
 
 # 确保这些进程名称是正确的，如果进程名称不匹配，插件将无法注入到正确的应用中。
 INSTALL_TARGET_PROCESSES = Surge-iOS
