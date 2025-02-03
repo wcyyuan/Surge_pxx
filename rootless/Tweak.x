@@ -533,30 +533,40 @@ NSString* sha256(NSData *data) {
 
 %hook SGULicenseViewController
 
+// 强制在类加载时 Hook
++ (void)load {
+    NSLog(@"[Surge Hook] SGULicenseViewController 被 Hook");
+}
+
+// Hook handleResponse 方法，确保 response 数据被正确处理
 - (void)handleResponse:(NSDictionary *)response {
+    NSLog(@"[Surge Hook] handleResponse 被调用: %@", response);
     %orig(response);
 }
 
+// Hook handleAsyncResponse，确保异步请求的 response 数据被正确处理
 - (void)handleAsyncResponse:(NSDictionary *)response {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSLog(@"[Surge Hook] handleAsyncResponse 被调用: %@", response);
         %orig(response);
     });
 }
 
+// Hook reloadCells，伪造 License 数据并刷新 UI
 - (void)reloadCells {
-    // 利用 runtime API 获取私有成员 _response
+    // 获取私有成员 _response
     NSDictionary *response = object_getIvar(self, class_getInstanceVariable([self class], "_response"));
     if (!response) {
+        NSLog(@"[Surge Hook] _response 为空，调用原始方法");
         %orig;
         return;
     }
+
+    // 伪造 License 数据
     NSMutableDictionary *mutableResponse = [response mutableCopy];
-    NSMutableDictionary *license = [mutableResponse[@"license"] mutableCopy];
-    if (!license) {
-        license = [NSMutableDictionary dictionary];
-    }
+    NSMutableDictionary *license = [mutableResponse[@"license"] mutableCopy] ?: [NSMutableDictionary dictionary];
+
     NSInteger expirationDate = FIXED_EXPIRATION_DATE;
-    // 伪造 license 相关字段
     license[@"email"] = @"pxx@gmail.com";
     license[@"fusDate"] = @(expirationDate);
     license[@"orderID"] = @"pxx917144686";
@@ -565,7 +575,7 @@ NSString* sha256(NSData *data) {
     license[@"status"] = @"active";
     license[@"licenseType"] = @"pro";
     mutableResponse[@"license"] = license;
-    
+
     // 添加当前设备信息
     NSString *deviceName = [[UIDevice currentDevice] name];
     NSMutableArray *devices = [NSMutableArray array];
@@ -576,9 +586,17 @@ NSString* sha256(NSData *data) {
     }];
     mutableResponse[@"devices"] = devices;
     mutableResponse[@"inactive"] = @(0);
+
     // 更新私有变量 _response
     object_setIvar(self, class_getInstanceVariable([self class], "_response"), [mutableResponse copy]);
-    [self.view setNeedsDisplay];
+
+    NSLog(@"[Surge Hook] _response 变量已修改: %@", mutableResponse);
+    
+    // 触发 UI 刷新
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.view setNeedsDisplay];
+    });
+
     %orig;
 }
 
