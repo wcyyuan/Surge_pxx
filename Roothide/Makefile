@@ -1,9 +1,7 @@
-# 适配 Roothide 的 Theos 编译配置
-
 # 插件信息
 PACKAGE_IDENTIFIER = com.pxx917144686.surge
 PACKAGE_NAME = Surge_pxx
-PACKAGE_VERSION = 0.4
+PACKAGE_VERSION = 0.4.1
 PACKAGE_ARCHITECTURE = arm64 arm64e
 PACKAGE_REVISION = 1540
 PACKAGE_SECTION = Tweaks
@@ -22,7 +20,6 @@ define Package/Surge
   Description: $(PACKAGE_DESCRIPTION)
 endef
 
-
 # 指定 Roothide 兼容路径**
 THEOS_PACKAGE_INSTALL_PREFIX = /private/var/containers/Bundle/tweaksupport/
 
@@ -39,6 +36,17 @@ SDK_PATH = $(shell xcode-select --print-path)/Platforms/iPhoneOS.platform/Develo
 # 直接输出到当前目录
 export THEOS_PACKAGE_DIR = $(CURDIR)
 
+# Roothide 特性：避免使用 /var/jb，利用动态加载机制
+# Roothide 在 @loader_path/.jbroot 下面查找依赖库
+# 将库路径设置为 @loader_path/.jbroot 确保正确加载
+Surge_CFLAGS = -fobjc-arc -I$(OPENSSL_PATH)/include -I$(OPENSSL_PATH)/include/openssl
+
+# 链接库
+Surge_LDFLAGS = -L$(OPENSSL_PATH)/lib -lssl -lcrypto -framework UIKit -framework Foundation -lsubstrate
+
+# 设置 Roothide 符号链接的动态加载路径
+export DYLD_LIBRARY_PATH = @loader_path/.jbroot/usr/lib
+
 # Theos 通用设置
 include $(THEOS)/makefiles/common.mk
 
@@ -51,14 +59,9 @@ Surge_FILES = Tweak.x
 # OpenSSL 配置路径
 OPENSSL_PATH = /Users/pxx917144686/openssl-ios
 
-# 启用 ARC 并添加 OpenSSL 头文件
-Surge_CFLAGS = -fobjc-arc -I$(OPENSSL_PATH)/include -I$(OPENSSL_PATH)/include/openssl
-
-# 链接 OpenSSL
-Surge_LDFLAGS = -L$(OPENSSL_PATH)/lib -lssl -lcrypto -framework UIKit -framework Foundation -lsubstrate
-
 # Theos 编译规则
 include $(THEOS_MAKE_PATH)/tweak.mk
+
 
 
 
