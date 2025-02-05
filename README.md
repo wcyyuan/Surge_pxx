@@ -66,7 +66,7 @@
 | **报错** | ld: warning: -multiply_defined is obsolete |
 | **解释** | 为什么会出现这个问题？ |
 | **原因** | 新版本的 Apple 链接器 (ld64) 不再推荐使用 `-multiply_defined`；Theos 为了兼容旧版本 iOS，才默认加入该选项。 |
-| **解决** | 在文件 `theos/makefiles/targets/_common/darwin_tail.mk` 中找到并删除 `-multiply_defined` |
+| **解决** | 在文件 `theos/makefiles/targets/_common/darwin_tail.mk` 打开文件，搜索找到并删除 `-multiply_defined suppress` |
 
 </details>
 
