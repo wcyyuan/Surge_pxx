@@ -18,6 +18,7 @@
 </td>
 <td style="width: 50%; vertical-align: top;">
     <pre>
+
     终端执行 克隆 Theos 仓库
     git clone --recursive https://github.com/theos/theos.git
 
