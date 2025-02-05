@@ -615,39 +615,6 @@ NSString* sha256(NSData *data) {
 
 %end
 
-// ---------------------- SGPolicyProxyWithTLS Hook ----------------------
-//
-// 针对 SGPolicyProxyWithTLS 进行 Hook，
-// 修改服务器证书指纹校验逻辑，返回伪造的指纹或直接允许通过，
-// 同时在 TLS 握手中接管认证挑战，返回正确凭证，从而绕过安全校验。
-//
-%hook SGPolicyProxyWithTLS
-
-- (NSString *)serverCertificateFingerprintSHA256 {
-    // 返回一个全 0 的伪造指纹
-    return @"0000000000000000000000000000000000000000000000000000000000000000";
-}
-
-- (BOOL)serverCertificateFingerprintSHA256:(NSData *)serverCertFingerprint {
-    // 将传入指纹与伪造指纹进行比较，若匹配则认为验证通过
-    NSData *fakeFingerprint = [@"fake_certificate_fingerprint" dataUsingEncoding:NSUTF8StringEncoding];
-    return [serverCertFingerprint isEqualToData:fakeFingerprint];
-}
-
-- (BOOL)session:(NSURLSession *)session
-  didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
-     completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
-    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-        // 直接信任服务器证书，创建对应 NSURLCredential 返回
-        NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
-        completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-    } else {
-        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
-    }
-    return YES;
-}
-
-%end
 
 // ---------------------- 绕过 OpenSSL 签名验证 ----------------------
 //
