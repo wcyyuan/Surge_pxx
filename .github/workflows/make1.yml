@@ -1,0 +1,21 @@
+name: Run Makefile
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 使用 Linux 环境（推荐）
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: sudo apt-get update && sudo apt-get install -y build-essential  # 安装依赖（根据项目需要调整）
+
+      - name: Run Makefile
+        run: make  # 执行默认 target
